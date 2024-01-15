@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Heading from './components/Heading'
 import ToDoItem from './components/ToDoItem'
 import Input from './components/Input'
@@ -15,18 +15,30 @@ function App() {
   const [counter, setCounter] = useState(0);
   const [items, setItems] = useState([]);
 
+  useEffect(() => {
+    const data = localStorage.getItem('items');
+    if (data) {
+      setItems(JSON.parse(data));
+    }
+    const count = localStorage.getItem('counter');
+    if (count) {
+      setCounter(JSON.parse(count));
+    }
+  }, []);
+
   const addItem = (text) => {
     const newItem = new Item(counter, text);
     const updatedItems = [...items, newItem];
     setItems(() => updatedItems)
-    setCounter(counter + 1);
-    console.log(updatedItems);
+    setCounter((prev) => prev + 1);
+    localStorage.setItem('items', JSON.stringify(updatedItems));
+    localStorage.setItem('counter', JSON.stringify(counter + 1));
   }
 
   const deleteItem = (id) => {
     const updatedItems = items.filter(item => item.id !== id);
     setItems(updatedItems);
-    setCounter(counter - 1);
+    localStorage.setItem('items', JSON.stringify(updatedItems));
   }
 
   const toggleItem = (id) => {
@@ -34,6 +46,7 @@ function App() {
       item.id === id ? { ...item, completed: !item.completed } : item
     );
     setItems(updatedItems);
+    localStorage.setItem('items', JSON.stringify(updatedItems));
   }
 
   const editItem = (id, text) => {
@@ -41,6 +54,7 @@ function App() {
       item.id === id ? { ...item, text: text } : item
     );
     setItems(updatedItems);
+    localStorage.setItem('items', JSON.stringify(updatedItems));
   }
 
   return (
